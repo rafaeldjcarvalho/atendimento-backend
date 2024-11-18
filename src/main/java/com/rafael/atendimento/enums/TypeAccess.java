@@ -1,11 +1,11 @@
 package com.rafael.atendimento.enums;
 
-public enum TypeAcess {
+public enum TypeAccess {
 	ALUNO("Aluno"), MONITOR("Monitor"), PROFESSOR("Professor"), ADMIN("Admin");
 	
 	private String value;
 	
-	private TypeAcess(String value) {
+	private TypeAccess(String value) {
 		this.value = value;
 	}
 	

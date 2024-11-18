@@ -2,7 +2,7 @@ package com.rafael.atendimento.entity;
 
 import org.hibernate.validator.constraints.Length;
 
-import com.rafael.atendimento.enums.TypeAcess;
+import com.rafael.atendimento.enums.TypeAccess;
 import com.rafael.atendimento.enums.UserStatus;
 import com.rafael.atendimento.enums.converters.TypeAcessConverter;
 import com.rafael.atendimento.enums.converters.UserStatusConverter;
@@ -54,7 +54,7 @@ public class User {
 	@NotNull
     @Column(length = 10, nullable = false)
     @Convert(converter = TypeAcessConverter.class)
-	private TypeAcess typeAcess;
+	private TypeAccess typeAccess;
 	
 	@NotNull
     @Column(length = 10, nullable = false)

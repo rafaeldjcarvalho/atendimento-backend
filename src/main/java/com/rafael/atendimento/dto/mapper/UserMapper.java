@@ -2,21 +2,21 @@ package com.rafael.atendimento.dto.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.rafael.atendimento.enums.TypeAcess;
+import com.rafael.atendimento.enums.TypeAccess;
 import com.rafael.atendimento.enums.UserStatus;
 
 @Component
 public class UserMapper {
 	
-	public TypeAcess convertTypeAcessValue(String value) {
+	public TypeAccess convertTypeAccessValue(String value) {
         if (value == null) {
             return null;
         }
         return switch (value) {
-            case "Aluno" -> TypeAcess.ALUNO;
-            case "Professor" -> TypeAcess.PROFESSOR;
-            case "Monitor" -> TypeAcess.MONITOR;
-            case "Admin" -> TypeAcess.ADMIN;
+            case "Aluno" -> TypeAccess.ALUNO;
+            case "Professor" -> TypeAccess.PROFESSOR;
+            case "Monitor" -> TypeAccess.MONITOR;
+            case "Admin" -> TypeAccess.ADMIN;
             default -> throw new IllegalArgumentException("Categoria inválida: " + value);
         };
     }
