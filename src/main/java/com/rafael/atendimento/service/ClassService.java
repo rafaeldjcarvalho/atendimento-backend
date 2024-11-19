@@ -2,12 +2,16 @@ package com.rafael.atendimento.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.rafael.atendimento.dto.ClassDTO;
+import com.rafael.atendimento.dto.mapper.ClassMapper;
 import com.rafael.atendimento.entity.Class;
+import com.rafael.atendimento.entity.User;
 import com.rafael.atendimento.repository.ClassRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,24 +21,31 @@ import lombok.RequiredArgsConstructor;
 public class ClassService {
 	
 	private final ClassRepository classRepository;
+	private final UserService userService;
+	private final ClassMapper classMapper;
 	
-	public List<Class> findAll() {
-		return classRepository.findAll();
+	public List<ClassDTO> findAll() {
+		return classRepository.findAll()
+				.stream()
+				.map(classMapper::toDTO)
+				.collect(Collectors.toList());
 	}
 	
-	public Class findById(Long id) {
-        return classRepository.findById(id)
+	public ClassDTO findById(Long id) {
+        Class turma = classRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
+        return classMapper.toDTO(turma);
     }
 	
-	public Class create(Class classRequest) {
+	public ClassDTO create(Class classRequest) {
         Optional<Class> existingClass = classRepository.findByName(classRequest.getName());
         if (existingClass.isEmpty()) {
         	try {
         		Class newClass = new Class();
         		newClass.setName(classRequest.getName());
         		newClass.setDate(classRequest.getDate());
-                return classRepository.save(newClass);
+                classRepository.save(newClass);
+                return classMapper.toDTO(newClass);
         	} catch (Exception ex) {
         		throw new RuntimeException("Class not registred");
         	}
@@ -43,13 +54,14 @@ public class ClassService {
         throw new RuntimeException("Class already exists");
     }
 	
-	public Class update(Long id, Class classRequest) {
+	public ClassDTO update(Long id, Class classRequest) {
 		Class existingClass = classRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
         		
 		existingClass.setName(classRequest.getName());
 		existingClass.setDate(classRequest.getDate());
-        return classRepository.save(existingClass);
+        Class updatedClass = classRepository.save(existingClass);
+        return classMapper.toDTO(updatedClass);
     }
 	
 	public void delete(Long id) {
@@ -58,5 +70,29 @@ public class ClassService {
 
         classRepository.delete(c);
     }
+	
+	public ClassDTO addUserInClass(Long classId, Long userId) {
+		Class existingClass = classRepository.findById(classId)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
+		User existingUser = userService.findUserById(userId);
+		
+		existingClass.addUser(existingUser);
+		Class newClass = classRepository.save(existingClass);
+		return classMapper.toDTO(newClass);
+	}
+	
+	//Antes de deletar o usuário da turma é necessário alterar o tipo de usuário
+	public ClassDTO deleteUserInClass(Long classId, Long userId) {
+		Class existingClass = classRepository.findById(classId)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
+		User existingUser = userService.findUserById(userId);
+		
+		existingClass.removeUser(existingUser);
+		Class newClass = classRepository.save(existingClass);
+		return classMapper.toDTO(newClass);
+	}
+	
+	//Atualizar usuário na turma - mudar status de aluno para monitor
+	
 
 }

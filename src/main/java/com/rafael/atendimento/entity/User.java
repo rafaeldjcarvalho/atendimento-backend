@@ -1,7 +1,10 @@
 package com.rafael.atendimento.entity;
 
+import java.util.List;
+
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rafael.atendimento.enums.TypeAccess;
 import com.rafael.atendimento.enums.UserStatus;
 import com.rafael.atendimento.enums.converters.TypeAcessConverter;
@@ -13,6 +16,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -60,5 +66,70 @@ public class User {
     @Column(length = 10, nullable = false)
     @Convert(converter = UserStatusConverter.class)
 	private UserStatus status = UserStatus.ATIVO;
+	
+	@ManyToOne
+	@JsonIgnoreProperties("monitores")
+	@JoinColumn(name = "class_id")
+	private Class monitorClass;  // monitores
+	
+	@ManyToMany(mappedBy = "alunos")
+	@JsonIgnoreProperties("alunos")
+	private List<Class> alunosClasses;  // alunos
+	
+	@ManyToMany(mappedBy = "professores")
+	@JsonIgnoreProperties("professores")
+	private List<Class> professoresClasses;  // professores
+	
+	// Métodos
+//	
+//	public void addClass(Class turma) {
+//	    switch (this.typeAccess) {
+//	        case ALUNO -> {
+//	            if (!this.alunosClasses.contains(turma)) {
+//	                this.alunosClasses.add(turma);
+//	                turma.getAlunos().add(this);
+//	            }
+//	        }
+//	        case PROFESSOR -> {
+//	            if (!this.professoresClasses.contains(turma)) {
+//	                this.professoresClasses.add(turma);
+//	                turma.getProfessores().add(this);
+//	            }
+//	        }
+//	        case MONITOR -> {
+//	            if (this.monitorClass == null) {
+//	                this.monitorClass = turma;
+//	                turma.getMonitores().add(this);
+//	            } else {
+//	                throw new IllegalStateException("O monitor já pertence a uma turma");
+//	            }
+//	        }
+//	        default -> throw new IllegalArgumentException("Tipo de usuário inválido");
+//	    }
+//	}
+//
+//	public void removeClass(Class turma) {
+//	    switch (this.typeAccess) {
+//	        case ALUNO -> {
+//	            if (this.alunosClasses.contains(turma)) {
+//	                this.alunosClasses.remove(turma);
+//	                turma.getAlunos().remove(this);
+//	            }
+//	        }
+//	        case PROFESSOR -> {
+//	            if (this.professoresClasses.contains(turma)) {
+//	                this.professoresClasses.remove(turma);
+//	                turma.getProfessores().remove(this);
+//	            }
+//	        }
+//	        case MONITOR -> {
+//	            if (this.monitorClass != null && this.monitorClass.equals(turma)) {
+//	                this.monitorClass = null;
+//	                turma.getMonitores().remove(this);
+//	            }
+//	        }
+//	        default -> throw new IllegalArgumentException("Tipo de usuário inválido");
+//	    }
+//	}
 
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rafael.atendimento.dto.RegisterRequestDTO;
 import com.rafael.atendimento.dto.UpdateRequestDTO;
-import com.rafael.atendimento.entity.User;
+import com.rafael.atendimento.dto.UserDTO;
 import com.rafael.atendimento.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,20 +27,20 @@ public class UserController {
 	private final UserService userService;
 	
 	@GetMapping
-	public List<User> findAll() {
+	public List<UserDTO> findAll() {
 		return userService.findAll();
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<User> findById(@PathVariable Long id) {
-		User user = userService.findById(id);
+	public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+		UserDTO user = userService.findById(id);
 		return ResponseEntity.ok(user);
 	}
 	
 	@PostMapping
     public ResponseEntity<?> createUser(@RequestBody RegisterRequestDTO userRequest) {
        try {
-    	   User user = userService.create(userRequest);
+    	   UserDTO user = userService.create(userRequest);
     	   return ResponseEntity.ok(user);
        } catch (RuntimeException ex) {
     	   return ResponseEntity.badRequest().body(ex.getMessage());
@@ -49,7 +49,7 @@ public class UserController {
 	
 	@PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UpdateRequestDTO userRequest) {
-	   User user = userService.update(id, userRequest);
+	   UserDTO user = userService.update(id, userRequest);
 	   return ResponseEntity.ok(user);
     }
 	

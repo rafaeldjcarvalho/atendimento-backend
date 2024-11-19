@@ -1,14 +1,20 @@
 package com.rafael.atendimento.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -37,5 +43,69 @@ public class Class {
 	
 	@NotNull
 	private LocalDate date;
+	
+	@OneToMany(mappedBy = "monitorClass")
+	@JsonIgnoreProperties("monitorClass")
+	private List<User> monitores;
+	
+	@ManyToMany
+	@JsonIgnoreProperties("alunosClasses")
+	@JoinTable(name = "class_alunos")
+	private List<User> alunos;
+	
+	@ManyToMany
+	@JsonIgnoreProperties("professoresClasses")
+	@JoinTable(name = "class_professores")
+	private List<User> professores;
+	
+	// Métodos
+	
+	public void addUser(User user) {
+	    switch (user.getTypeAccess()) {
+	        case ALUNO -> {
+	            if (!this.alunos.contains(user)) {
+	                this.alunos.add(user);
+	                user.getAlunosClasses().add(this);
+	            }
+	        }
+	        case PROFESSOR -> {
+	            if (!this.professores.contains(user)) {
+	                this.professores.add(user);
+	                user.getProfessoresClasses().add(this);
+	            }
+	        }
+	        case MONITOR -> {
+	            if (!this.monitores.contains(user)) {
+	                this.monitores.add(user);
+	                user.setMonitorClass(this); // Monitores geralmente pertencem a apenas uma turma
+	            }
+	        }
+	        default -> throw new IllegalArgumentException("Tipo de usuário inválido");
+	    }
+	}
+	
+	public void removeUser(User user) {
+	    switch (user.getTypeAccess()) {
+	        case ALUNO -> {
+	            if (this.alunos.contains(user)) {
+	                this.alunos.remove(user);
+	                user.getAlunosClasses().remove(this);
+	            }
+	        }
+	        case PROFESSOR -> {
+	            if (this.professores.contains(user)) {
+	                this.professores.remove(user);
+	                user.getProfessoresClasses().remove(this);
+	            }
+	        }
+	        case MONITOR -> {
+	            if (this.monitores.contains(user)) {
+	                this.monitores.remove(user);
+	                user.setMonitorClass(null); // Remove a referência da turma no monitor
+	            }
+	        }
+	        default -> throw new IllegalArgumentException("Tipo de usuário inválido");
+	    }
+	}
 	
 }

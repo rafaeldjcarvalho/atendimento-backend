@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rafael.atendimento.dto.ClassDTO;
 import com.rafael.atendimento.entity.Class;
 import com.rafael.atendimento.service.ClassService;
 
@@ -26,20 +27,20 @@ public class ClassController {
 	private final ClassService classService;
 	
 	@GetMapping
-	public List<Class> findAll() {
+	public List<ClassDTO> findAll() {
 		return classService.findAll();
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Class> findById(@PathVariable Long id) {
-		Class findClass = classService.findById(id);
+	public ResponseEntity<ClassDTO> findById(@PathVariable Long id) {
+		ClassDTO findClass = classService.findById(id);
 		return ResponseEntity.ok(findClass);
 	}
 	
 	@PostMapping
     public ResponseEntity<?> createClass(@RequestBody @Valid Class classRequest) {
        try {
-    	   Class findClass = classService.create(classRequest);
+    	   ClassDTO findClass = classService.create(classRequest);
     	   return ResponseEntity.ok(findClass);
        } catch (RuntimeException ex) {
     	   return ResponseEntity.badRequest().body(ex.getMessage());
@@ -48,7 +49,7 @@ public class ClassController {
 	
 	@PutMapping("/{id}")
     public ResponseEntity<?> updateClass(@PathVariable Long id, @RequestBody @Valid Class classRequest) {
-	   Class findClass = classService.update(id, classRequest);
+		ClassDTO findClass = classService.update(id, classRequest);
 	   return ResponseEntity.ok(findClass);
     }
 	
@@ -57,5 +58,27 @@ public class ClassController {
 		classService.delete(id);
         return ResponseEntity.noContent().build();
     }
+	
+	// Métodos de Relacionamtentos
+	
+	@PostMapping("/{classId}/add-user/{userId}")
+	public ResponseEntity<?> addUserInClass(@PathVariable Long classId, @PathVariable Long userId) {
+		try {
+			ClassDTO updatedClass = classService.addUserInClass(classId, userId);
+			return ResponseEntity.ok(updatedClass);
+        } catch (RuntimeException ex) {
+        	return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+	}
+	
+	@DeleteMapping("/{classId}/remove-user/{userId}")
+	public ResponseEntity<?> removeUserInClass(@PathVariable Long classId, @PathVariable Long userId) {
+		try {
+			ClassDTO updatedClass = classService.deleteUserInClass(classId, userId);
+			return ResponseEntity.ok(updatedClass);
+        } catch (RuntimeException ex) {
+        	return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+	}
 
 }
