@@ -5,8 +5,13 @@ import org.springframework.stereotype.Component;
 import com.rafael.atendimento.dto.ClassDTO;
 import com.rafael.atendimento.entity.Class;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class ClassMapper {
+	
+	private final UserMapper userMapper;
 	
 	public ClassDTO toDTO(Class turma) {
 	    if (turma == null) {
@@ -15,7 +20,8 @@ public class ClassMapper {
 	    return new ClassDTO(
 	        turma.getId(),
 	        turma.getName(),
-	        turma.getDate()
+	        turma.getDate(),
+	        userMapper.toDTO(turma.getOwner())
 	    );
 	}
 	
@@ -30,6 +36,7 @@ public class ClassMapper {
 	    }
 	    classes.setName(classDTO.name());
 	    classes.setDate(classDTO.date());
+	    classes.setOwner(userMapper.toEntity(classDTO.owner()));
 	    
 	    return classes;
 	}

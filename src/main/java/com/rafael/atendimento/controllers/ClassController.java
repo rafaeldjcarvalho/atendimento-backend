@@ -49,8 +49,12 @@ public class ClassController {
 	
 	@PutMapping("/{id}")
     public ResponseEntity<?> updateClass(@PathVariable Long id, @RequestBody @Valid Class classRequest) {
-		ClassDTO findClass = classService.update(id, classRequest);
-	   return ResponseEntity.ok(findClass);
+		try {
+			ClassDTO findClass = classService.update(id, classRequest);
+			return ResponseEntity.ok(findClass);
+		} catch (RuntimeException ex) {
+	    	return ResponseEntity.badRequest().body(ex.getMessage());
+	    }
     }
 	
 	@DeleteMapping("/{id}")

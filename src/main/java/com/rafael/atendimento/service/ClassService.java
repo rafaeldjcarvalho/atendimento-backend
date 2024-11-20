@@ -41,13 +41,15 @@ public class ClassService {
         Optional<Class> existingClass = classRepository.findByName(classRequest.getName());
         if (existingClass.isEmpty()) {
         	try {
+        		User user = userService.findUserById(classRequest.getOwner().getId());
         		Class newClass = new Class();
         		newClass.setName(classRequest.getName());
         		newClass.setDate(classRequest.getDate());
+        		newClass.setOwner(user);
                 classRepository.save(newClass);
                 return classMapper.toDTO(newClass);
         	} catch (Exception ex) {
-        		throw new RuntimeException("Class not registred");
+        		throw new RuntimeException("Class not registred" + ex.getMessage());
         	}
             
         }

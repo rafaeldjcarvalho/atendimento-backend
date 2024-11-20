@@ -5,4 +5,5 @@ import java.time.LocalDate;
 public record ClassDTO (
 		Long id,
 		String name,
-		LocalDate date) {}
+		LocalDate date,
+		UserDTO owner) {}

@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -66,6 +67,10 @@ public class User {
     @Column(length = 10, nullable = false)
     @Convert(converter = UserStatusConverter.class)
 	private UserStatus status = UserStatus.ATIVO;
+	
+	@OneToMany(mappedBy = "owner")
+	@JsonIgnoreProperties("owner")
+	private List<Class> myClasses;
 	
 	@ManyToOne
 	@JsonIgnoreProperties("monitores")
