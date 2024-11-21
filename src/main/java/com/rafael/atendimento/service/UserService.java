@@ -44,6 +44,11 @@ public class UserService {
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 	
+	public User findByEmail(String email) {
+		return userRepository.findByEmail(email)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+	
 	public UserDTO create(RegisterRequestDTO userRequest) {
         Optional<User> user = userRepository.findByEmail(userRequest.email());
         if (user.isEmpty()) {

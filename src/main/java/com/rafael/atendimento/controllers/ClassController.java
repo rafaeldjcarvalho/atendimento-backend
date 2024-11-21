@@ -1,7 +1,5 @@
 package com.rafael.atendimento.controllers;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,13 +8,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rafael.atendimento.dto.ClassDTO;
+import com.rafael.atendimento.dto.ClassPageDTO;
 import com.rafael.atendimento.entity.Class;
 import com.rafael.atendimento.service.ClassService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -26,10 +29,16 @@ public class ClassController {
 	
 	private final ClassService classService;
 	
+//	@GetMapping
+//	public List<ClassDTO> findAll() {
+//		return classService.findAll();
+//	}
+	
 	@GetMapping
-	public List<ClassDTO> findAll() {
-		return classService.findAll();
-	}
+    public ClassPageDTO list(@RequestParam(defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(defaultValue = "10") @Positive @Max(100) int pageSize) {
+        return classService.list(page, pageSize);
+    }
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<ClassDTO> findById(@PathVariable Long id) {
@@ -38,7 +47,7 @@ public class ClassController {
 	}
 	
 	@PostMapping
-    public ResponseEntity<?> createClass(@RequestBody @Valid Class classRequest) {
+    public ResponseEntity<?> createClass(@RequestBody @Valid ClassDTO classRequest) {
        try {
     	   ClassDTO findClass = classService.create(classRequest);
     	   return ResponseEntity.ok(findClass);
