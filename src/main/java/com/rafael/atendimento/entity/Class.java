@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -64,6 +65,10 @@ public class Class {
 	@JsonIgnoreProperties("professoresClasses")
 	@JoinTable(name = "class_professores")
 	private List<User> professores;
+	
+	@OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnoreProperties("clazz")
+	private List<Calendar> calendars;
 	
 	// Métodos
 	
