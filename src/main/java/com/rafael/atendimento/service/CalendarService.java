@@ -2,11 +2,13 @@ package com.rafael.atendimento.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.rafael.atendimento.entity.Calendar;
 import com.rafael.atendimento.entity.Class;
+import com.rafael.atendimento.entity.Schedule;
 import com.rafael.atendimento.entity.User;
 import com.rafael.atendimento.dto.CalendarDTO;
 import com.rafael.atendimento.dto.ScheduleDTO;
@@ -39,6 +41,17 @@ public class CalendarService {
         Calendar calendar = new Calendar();
         calendar.setOwner(owner);
         calendar.setClazz(clazz);
+        
+        List<Schedule> schedules = calendarDTO.schedules().stream().map(scheduleDTO -> {
+            Schedule schedule = new Schedule();
+            schedule.setDayOfWeek(scheduleDTO.dayOfWeek());
+            schedule.setStartTime(scheduleDTO.startTime());
+            schedule.setEndTime(scheduleDTO.endTime());
+            schedule.setCalendar(calendar); // Define a referência ao calendário
+            return schedule;
+        }).collect(Collectors.toList());
+        
+        calendar.setSchedules(schedules);
 
         calendarRepository.save(calendar);
 
