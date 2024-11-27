@@ -1,6 +1,7 @@
 package com.rafael.atendimento.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
@@ -81,10 +82,15 @@ public class Class {
 	            }
 	        }
 	        case PROFESSOR -> {
-	            if (!this.professores.contains(user)) {
+	        	if(this.professores == null) {
+	        		this.professores = new ArrayList<>();
+	        		this.professores.add(user);
+	                user.getProfessoresClasses().add(this);
+	        	} else if(!this.professores.contains(user)) {
 	                this.professores.add(user);
 	                user.getProfessoresClasses().add(this);
-	            }
+	        	}
+	            
 	        }
 	        case MONITOR -> {
 	            if (!this.monitores.contains(user)) {

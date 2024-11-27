@@ -100,6 +100,16 @@ public class ClassController {
         }
 	}
 	
+	@GetMapping("/class-user/{userId}")
+    public ResponseEntity<?> getUserClasses(@PathVariable Long userId) {
+		try {
+			List<ClassDTO> classes = classService.getClassesForUser(userId);
+	        return ResponseEntity.ok(classes);
+		} catch (RuntimeException ex) {
+			return ResponseEntity.badRequest().body(ex.getMessage());
+		}
+    }
+	
 	// Criar um novo calendário para a turma
 	@PostMapping("/{classId}/calendars")
     public ResponseEntity<?> createCalendar(@PathVariable Long classId, @RequestBody @Valid CalendarDTO calendarDTO) {

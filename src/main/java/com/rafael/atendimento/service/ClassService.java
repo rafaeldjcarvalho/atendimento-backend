@@ -1,5 +1,6 @@
 package com.rafael.atendimento.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,6 +60,7 @@ public class ClassService {
         		newClass.setName(classRequest.name());
         		newClass.setDate(classRequest.date());
         		newClass.setOwner(user);
+        		newClass.addUser(user);
                 classRepository.save(newClass);
                 return classMapper.toDTO(newClass);
         	} catch (Exception ex) {
@@ -91,9 +93,14 @@ public class ClassService {
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
 		User existingUser = userService.findUserById(userId);
 		
-		existingClass.addUser(existingUser);
-		Class newClass = classRepository.save(existingClass);
-		return classMapper.toDTO(newClass);
+		if(!existingClass.getAlunos().contains(existingUser) || 
+				!existingClass.getMonitores().contains(existingUser) || 
+					!existingClass.getProfessores().contains(existingUser)) {
+			existingClass.addUser(existingUser);
+			Class newClass = classRepository.save(existingClass);
+			return classMapper.toDTO(newClass);
+		}
+		throw new RuntimeException("user is already registered");
 	}
 	
 	//Antes de deletar o usuário da turma é necessário alterar o tipo de usuário
@@ -102,12 +109,34 @@ public class ClassService {
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
 		User existingUser = userService.findUserById(userId);
 		
-		existingClass.removeUser(existingUser);
-		Class newClass = classRepository.save(existingClass);
-		return classMapper.toDTO(newClass);
+		if(existingClass.getAlunos().contains(existingUser) || 
+				existingClass.getMonitores().contains(existingUser) || 
+					existingClass.getProfessores().contains(existingUser)) {
+			existingClass.removeUser(existingUser);
+			Class newClass = classRepository.save(existingClass);
+			return classMapper.toDTO(newClass);
+		}
+		throw new RuntimeException("user is not registered");
 	}
 	
 	//Atualizar usuário na turma - mudar status de aluno para monitor
 	
+	public List<ClassDTO> getClassesForUser(Long userId) {
+        userService.findUserById(userId);
 
+        List<ClassDTO> classes = new ArrayList<>();
+        classes.addAll(classRepository.findClassesByAlunoId(userId)
+        		.stream()
+        		.map(classMapper::toDTO)
+        		.collect(Collectors.toList()));
+        classes.addAll(classRepository.findClassesByProfessorId(userId)
+        		.stream()
+        		.map(classMapper::toDTO)
+        		.collect(Collectors.toList()));
+        classes.addAll(classRepository.findClassesByMonitorId(userId)
+        		.stream()
+        		.map(classMapper::toDTO)
+        		.collect(Collectors.toList()));
+        return classes;
+    }
 }
