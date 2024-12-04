@@ -71,6 +71,10 @@ public class Class {
 	@JsonIgnoreProperties("clazz")
 	private List<Calendar> calendars;
 	
+	 @OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL, orphanRemoval = true)
+	 @JsonIgnoreProperties("clazz")
+	 private List<OrderService> orders;
+	
 	// Métodos
 	
 	public void addUser(User user) {

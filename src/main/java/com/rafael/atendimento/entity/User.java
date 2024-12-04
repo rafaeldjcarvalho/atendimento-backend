@@ -10,6 +10,7 @@ import com.rafael.atendimento.enums.UserStatus;
 import com.rafael.atendimento.enums.converters.TypeAcessConverter;
 import com.rafael.atendimento.enums.converters.UserStatusConverter;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -84,6 +85,10 @@ public class User {
 	@ManyToMany(mappedBy = "professores")
 	@JsonIgnoreProperties("professores")
 	private List<Class> professoresClasses;  // professores
+	
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("owner")
+    private List<OrderService> orders;
 	
 	// Métodos
 //	

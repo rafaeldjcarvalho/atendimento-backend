@@ -50,6 +50,12 @@ public class ClassService {
         return classMapper.toDTO(turma);
     }
 	
+	public Class findClassById(Long id) {
+        Class turma = classRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
+        return turma;
+    }
+	
 	public ClassDTO create(ClassDTO classRequest) {
         Optional<Class> existingClass = classRepository.findByName(classRequest.name());
         if (existingClass.isEmpty()) {

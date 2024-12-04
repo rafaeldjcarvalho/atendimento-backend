@@ -1,11 +1,11 @@
 package com.rafael.atendimento.enums;
 
-public enum TypeAccess {
-	ALUNO("Aluno"), MONITOR("Monitor"), PROFESSOR("Professor"), ADMIN("Admin");
+public enum ServiceStatus {
+	PENDENTE("Pendente"), CONCLUIDO("Concluido"), CANCELADO("Cancelado");
 	
 	private String value;
 	
-	private TypeAccess(String value) {
+	private ServiceStatus(String value) {
 		this.value = value;
 	}
 	
