@@ -18,8 +18,8 @@ public class UserMapper {
 	        user.getId(),
 	        user.getName(),
 	        user.getEmail(),
-	        user.getTypeAccess(),
-	        user.getStatus()
+	        user.getTypeAccess().getValue(),
+	        user.getStatus().getValue()
 	    );
 	}
 	
@@ -34,8 +34,8 @@ public class UserMapper {
 	    }
 	    user.setName(userDTO.name());
 	    user.setEmail(userDTO.email());
-	    user.setTypeAccess(userDTO.typeAccess());
-	    user.setStatus(userDTO.status());
+	    user.setTypeAccess(convertTypeAccessValue(userDTO.typeAccess()));
+	    user.setStatus(convertUserStatusValue(userDTO.status()));
 	    
 	    return user;
 	}
