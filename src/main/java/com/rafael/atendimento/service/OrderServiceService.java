@@ -3,10 +3,13 @@ package com.rafael.atendimento.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.rafael.atendimento.dto.OrderPageDTO;
 import com.rafael.atendimento.dto.OrderServiceDTO;
 import com.rafael.atendimento.dto.mapper.OrderMapper;
 import com.rafael.atendimento.entity.OrderService;
@@ -14,6 +17,9 @@ import com.rafael.atendimento.entity.User;
 import com.rafael.atendimento.entity.Class;
 import com.rafael.atendimento.repository.OrderServiceRepository;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,11 +31,17 @@ public class OrderServiceService {
 	private final ClassService classService;
 	private final UserService userService;
 	
-	public List<OrderServiceDTO> findAll() {
-		return orderRepository.findAll().stream()
-				.map(orderMapper::toDTO)
-				.collect(Collectors.toList());
-	}
+//	public List<OrderServiceDTO> findAll() {
+//		return orderRepository.findAll().stream()
+//				.map(orderMapper::toDTO)
+//				.collect(Collectors.toList());
+//	}
+	
+	public OrderPageDTO findAllPages(@PositiveOrZero int page, @Positive @Max(100) int pageSize) {
+        Page<OrderService> pageOrder = orderRepository.findAll(PageRequest.of(page, pageSize));
+        List<OrderServiceDTO> orders = pageOrder.get().map(orderMapper::toDTO).collect(Collectors.toList());
+        return new OrderPageDTO(orders, pageOrder.getTotalElements(), pageOrder.getTotalPages());
+    }
 	
 	public OrderServiceDTO findById(Long id) {
 		OrderService order = orderRepository.findById(id)
@@ -69,19 +81,22 @@ public class OrderServiceService {
 	}
 	
 	// Relacionamentos
-	
-	public List<OrderServiceDTO> getOrdersByClass(Long classId) {
-        return orderRepository.findByClazz_Id(classId)
-        		.stream()
-        		.map(orderMapper::toDTO)
-        		.collect(Collectors.toList());
+	public OrderPageDTO getOrdersByClass(
+			Long classId, 
+			@PositiveOrZero int page, 
+			@Positive @Max(100) int pageSize) {
+        Page<OrderService> pageOrder = orderRepository.findByClazz_Id(classId, PageRequest.of(page, pageSize));
+        List<OrderServiceDTO> orders = pageOrder.get().map(orderMapper::toDTO).collect(Collectors.toList());
+        return new OrderPageDTO(orders, pageOrder.getTotalElements(), pageOrder.getTotalPages());
     }
 
-    public List<OrderServiceDTO> getOrdersByUser(Long userId) {
-        return orderRepository.findByOwner_Id(userId)
-        		.stream()
-        		.map(orderMapper::toDTO)
-        		.collect(Collectors.toList());
+    public OrderPageDTO getOrdersByUser(
+    		Long userId,
+    		@PositiveOrZero int page, 
+			@Positive @Max(100) int pageSize) {
+    	Page<OrderService> pageOrder = orderRepository.findByOwner_Id(userId, PageRequest.of(page, pageSize));
+        List<OrderServiceDTO> orders = pageOrder.get().map(orderMapper::toDTO).collect(Collectors.toList());
+        return new OrderPageDTO(orders, pageOrder.getTotalElements(), pageOrder.getTotalPages());
     }
 
 }
