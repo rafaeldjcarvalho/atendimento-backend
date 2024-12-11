@@ -87,4 +87,10 @@ public class UserService {
 
         userRepository.delete(user);
     }
+	
+	public List<UserDTO> getAllStudentsInClass(Long classId) {
+		List<User> users = userRepository.findStudentsByClassId(classId);
+		List<UserDTO> usersDTO = users.stream().map(userMapper::toDTO).collect(Collectors.toList());
+		return usersDTO;
+	}
 }

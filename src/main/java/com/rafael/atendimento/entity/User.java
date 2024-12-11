@@ -22,6 +22,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -49,8 +50,9 @@ public class User {
 	
 	@NotBlank
 	@NotNull
+	@Email
 	@Length(min = 5, max = 100)
-	@Column(length = 100, nullable = false)
+	@Column(length = 100, nullable = false, unique = true)
 	private String email;
 	
 	@NotBlank
@@ -89,6 +91,14 @@ public class User {
 	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("owner")
     private List<OrderService> orders;
+	
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("owner")
+    private List<CustomerService> customerServices;
+	
+	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("student")
+    private List<CustomerService> studentCustomerServices;
 	
 	// Métodos
 //	

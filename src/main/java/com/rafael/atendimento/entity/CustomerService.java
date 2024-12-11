@@ -26,12 +26,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "orderServices")
+@Table(name = "customerServices")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderService {
+public class CustomerService {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -63,16 +63,21 @@ public class OrderService {
     @Convert(converter = ServiceStatusConverter.class)
 	private ServiceStatus status;
 	
-	// Relacionamento com Turma
-    @ManyToOne
+	// Relacionamento com turma
+	@ManyToOne
     @JoinColumn(name = "class_id", nullable = false)
-    @JsonIgnoreProperties("orders")
+    @JsonIgnoreProperties("customerServices")
     private Class clazz;
-
-    // Relacionamento com Usuário
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    @JsonIgnoreProperties("orders")
+	
+	// Relacionamento com professor/monitor
+	@ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties("customerServices")
     private User owner;
-
+	
+	// Relacionamento com aluno
+	@ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    @JsonIgnoreProperties("studentCustomerServices")
+    private User student;
 }

@@ -58,5 +58,15 @@ public class UserController {
 		userService.delete(id);
         return ResponseEntity.noContent().build();
     }
+	
+	@GetMapping("/user-class/{classId}")
+    public ResponseEntity<?> getUserClasses(@PathVariable Long classId) {
+		try {
+			List<UserDTO> users = userService.getAllStudentsInClass(classId);
+	        return ResponseEntity.ok(users);
+		} catch (RuntimeException ex) {
+			return ResponseEntity.badRequest().body(ex.getMessage());
+		}
+    }
 
 }

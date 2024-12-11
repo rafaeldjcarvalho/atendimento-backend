@@ -77,6 +77,8 @@ public class OrderServiceService {
 	}
 	
 	public void delete(Long id) {
+		orderRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
 		orderRepository.deleteById(id);
 	}
 	

@@ -74,6 +74,10 @@ public class Class {
 	 @OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonIgnoreProperties("clazz")
 	 private List<OrderService> orders;
+	 
+	 @OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL, orphanRemoval = true)
+	 @JsonIgnoreProperties("clazz")
+	 private List<CustomerService> customerServices;
 	
 	// Métodos
 	
