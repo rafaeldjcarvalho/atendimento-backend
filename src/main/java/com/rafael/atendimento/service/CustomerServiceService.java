@@ -48,6 +48,12 @@ public class CustomerServiceService {
         return new CustomerPageDTO(customers, pageCustomer.getTotalElements(), pageCustomer.getTotalPages());
     }
 	
+	public List<CustomerServiceDTO> findAllByOwner(Long id) {
+		return serviceRepository.findByOwner_Id(id).stream()
+				.map(serviceMapper::toDTO)
+				.collect(Collectors.toList());
+	}
+	
 	public CustomerServiceDTO findById(Long id) {
 		CustomerService order = serviceRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer Service not found"));

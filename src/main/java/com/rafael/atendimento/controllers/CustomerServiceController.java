@@ -1,5 +1,7 @@
 package com.rafael.atendimento.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -94,6 +96,11 @@ public class CustomerServiceController {
 			@RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "12") @Positive @Max(100) int pageSize) {
 		return customerService.getCustomerServicesByOwner(id_owner, page, pageSize);
+	}
+    
+    @GetMapping("/owner/services/{id_owner}")
+	public List<CustomerServiceDTO> getAllServiceByOwner(@PathVariable Long id_owner) {
+		return customerService.findAllByOwner(id_owner);
 	}
     
     // Buscar apenas do Aluno

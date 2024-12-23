@@ -11,6 +11,7 @@ import com.rafael.atendimento.entity.Class;
 import com.rafael.atendimento.entity.Schedule;
 import com.rafael.atendimento.entity.User;
 import com.rafael.atendimento.dto.CalendarDTO;
+import com.rafael.atendimento.dto.CustomerServiceDTO;
 import com.rafael.atendimento.dto.ScheduleDTO;
 import com.rafael.atendimento.repository.CalendarRepository;
 import com.rafael.atendimento.repository.ClassRepository;
@@ -25,6 +26,7 @@ public class CalendarService {
 	private final ClassRepository classRepository;
     private final CalendarRepository calendarRepository;
     private final UserRepository userRepository;
+    private final CustomerServiceService customerService;
     
  // Criar um calendário
     public CalendarDTO createCalendar(Long classId, CalendarDTO calendarDTO) {
@@ -80,6 +82,12 @@ public class CalendarService {
     public void deleteCalendar(Long classId, Long calendarId) {
         Calendar calendar = calendarRepository.findByIdAndClazzId(calendarId, classId)
                 .orElseThrow(() -> new RuntimeException("Calendar not found"));
+        List<CustomerServiceDTO> listServices = customerService.findAllByOwner(calendar.getOwner().getId());
+        
+        for (CustomerServiceDTO service : listServices) {
+            customerService.delete(service.id());
+        }
+        
         calendarRepository.delete(calendar);
     }
 
