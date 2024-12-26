@@ -8,5 +8,5 @@ public record UserDTO (
 		Long id,
 		String name,
 		String email,
-		@ValueOfEnum(enumClass = TypeAccess.class) String typeAccess,
+		@ValueOfEnum(enumClass = TypeAccess.class) String access,
 		@ValueOfEnum(enumClass = UserStatus.class) String status) {}

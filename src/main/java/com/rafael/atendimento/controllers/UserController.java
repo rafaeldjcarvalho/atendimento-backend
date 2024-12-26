@@ -68,5 +68,25 @@ public class UserController {
 			return ResponseEntity.badRequest().body(ex.getMessage());
 		}
     }
+	
+	@GetMapping("/userTeachers-class/{classId}")
+    public ResponseEntity<?> getUserTeachersClasses(@PathVariable Long classId) {
+		try {
+			List<UserDTO> users = userService.getAllTeachersInClass(classId);
+	        return ResponseEntity.ok(users);
+		} catch (RuntimeException ex) {
+			return ResponseEntity.badRequest().body(ex.getMessage());
+		}
+    }
+	
+	@GetMapping("/userMonitors-class/{classId}")
+    public ResponseEntity<?> getUserMonitorsClasses(@PathVariable Long classId) {
+		try {
+			List<UserDTO> users = userService.getAllMonitorsInClass(classId);
+	        return ResponseEntity.ok(users);
+		} catch (RuntimeException ex) {
+			return ResponseEntity.badRequest().body(ex.getMessage());
+		}
+    }
 
 }

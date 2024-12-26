@@ -93,4 +93,16 @@ public class UserService {
 		List<UserDTO> usersDTO = users.stream().map(userMapper::toDTO).collect(Collectors.toList());
 		return usersDTO;
 	}
+	
+	public List<UserDTO> getAllTeachersInClass(Long classId) {
+		List<User> users = userRepository.findTeachersByClassId(classId);
+		List<UserDTO> usersDTO = users.stream().map(userMapper::toDTO).collect(Collectors.toList());
+		return usersDTO;
+	}
+	
+	public List<UserDTO> getAllMonitorsInClass(Long classId) {
+		List<User> users = userRepository.findMonitorByClassId(classId);
+		List<UserDTO> usersDTO = users.stream().map(userMapper::toDTO).collect(Collectors.toList());
+		return usersDTO;
+	}
 }

@@ -34,7 +34,7 @@ public class UserMapper {
 	    }
 	    user.setName(userDTO.name());
 	    user.setEmail(userDTO.email());
-	    user.setTypeAccess(convertTypeAccessValue(userDTO.typeAccess()));
+	    user.setTypeAccess(convertTypeAccessValue(userDTO.access()));
 	    user.setStatus(convertUserStatusValue(userDTO.status()));
 	    
 	    return user;
