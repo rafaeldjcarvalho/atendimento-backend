@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.rafael.atendimento.enums.TypeAccess;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -84,9 +85,13 @@ public class Class {
 	public void addUser(User user) {
 	    switch (user.getTypeAccess()) {
 	        case ALUNO -> {
-	            if (!this.alunos.contains(user)) {
+	            if (!this.alunos.contains(user) && !this.monitores.contains(user)) {
 	                this.alunos.add(user);
 	                user.getAlunosClasses().add(this);
+	            } else if (this.monitores.contains(user)) {
+	            	//user.setTypeAccess(TypeAccess.MONITOR);
+	            	this.monitores.add(user);
+	            	//user.setMonitorClass(this);
 	            }
 	        }
 	        case PROFESSOR -> {
@@ -102,8 +107,10 @@ public class Class {
 	        }
 	        case MONITOR -> {
 	            if (!this.monitores.contains(user)) {
-	                this.monitores.add(user);
-	                user.setMonitorClass(this); // Monitores geralmente pertencem a apenas uma turma
+	            	//user.setTypeAccess(TypeAccess.ALUNO);
+	                this.alunos.add(user);
+	                user.getAlunosClasses().add(this);
+	                //user.setMonitorClass(this); // Monitores geralmente pertencem a apenas uma turma
 	            }
 	        }
 	        default -> throw new IllegalArgumentException("Tipo de usuário inválido");
@@ -127,7 +134,11 @@ public class Class {
 	        case MONITOR -> {
 	            if (this.monitores.contains(user)) {
 	                this.monitores.remove(user);
+	                user.setTypeAccess(TypeAccess.ALUNO);
 	                user.setMonitorClass(null); // Remove a referência da turma no monitor
+	            } else if (this.alunos.contains(user)) {
+	            	this.alunos.remove(user);
+	                user.getAlunosClasses().remove(this);
 	            }
 	        }
 	        default -> throw new IllegalArgumentException("Tipo de usuário inválido");

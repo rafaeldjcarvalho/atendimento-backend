@@ -134,5 +134,24 @@ public class ClassController {
         calendarService.deleteCalendar(classId, calendarId);
         return ResponseEntity.noContent().build();
     }
-
+    
+    @PutMapping("/{classId}/promote/{userId}")
+    public ResponseEntity<?> promoteToMonitor(@PathVariable Long classId, @PathVariable Long userId) {
+    	try {
+    		classService.promoteToMonitor(classId, userId);
+    		return ResponseEntity.ok().build();
+    	} catch (RuntimeException ex) {
+    		return ResponseEntity.badRequest().body(ex.getMessage());
+    	}
+    }
+    
+    @PutMapping("/{classId}/demote/{userId}")
+    public ResponseEntity<?> demoteToStudent(@PathVariable Long classId, @PathVariable Long userId) {
+    	try {
+    		classService.demoteToStudent(classId, userId);
+    		return ResponseEntity.ok().build();
+    	} catch (RuntimeException ex) {
+    		return ResponseEntity.badRequest().body(ex.getMessage());
+    	}
+    }
 }

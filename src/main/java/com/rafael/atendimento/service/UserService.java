@@ -105,4 +105,17 @@ public class UserService {
 		List<UserDTO> usersDTO = users.stream().map(userMapper::toDTO).collect(Collectors.toList());
 		return usersDTO;
 	}
+
+	public boolean isUserAlreadyMonitor(Long userId) {
+		return userRepository.isUserAlreadyMonitor(userId);
+	}
+	
+	public UserDTO updateTypeOfUser(User user) {
+		User existingUser = userRepository.findById(user.getId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+		existingUser.setTypeAccess(user.getTypeAccess());
+		existingUser.setMonitorClass(user.getMonitorClass());
+		userRepository.save(existingUser);
+		return userMapper.toDTO(existingUser);
+	}
 }

@@ -60,6 +60,12 @@ public class CustomerServiceService {
 		return serviceMapper.toDTO(order);
 	}
 	
+	public CustomerService findServiceById(Long id) {
+		CustomerService order = serviceRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer Service not found"));
+		return order;
+	}
+	
 	public CustomerServiceDTO create(CustomerServiceDTO serviceDTO) {
 		CustomerService service = serviceMapper.toEntity(serviceDTO);
 		Class clazz = classService.findClassById(serviceDTO.classId());

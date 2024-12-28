@@ -100,6 +100,10 @@ public class User {
     @JsonIgnoreProperties("student")
     private List<CustomerService> studentCustomerServices;
 	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnoreProperties("user")
+	private List<Attendance> attendances;
+	
 	// Métodos
 //	
 //	public void addClass(Class turma) {
