@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rafael.atendimento.entity.Attendance;
+import com.rafael.atendimento.dto.AttendanceDTO;
 import com.rafael.atendimento.enums.AttendanceStatus;
 import com.rafael.atendimento.service.AttendanceService;
 
@@ -25,7 +25,7 @@ public class AttendanceController {
 	private final AttendanceService attendanceService;
 	
 	@GetMapping("/by-service/{serviceId}")
-    public ResponseEntity<List<Attendance>> getAttendancesByService(@PathVariable Long serviceId) {
+    public ResponseEntity<List<AttendanceDTO>> getAttendancesByService(@PathVariable Long serviceId) {
         return ResponseEntity.ok(attendanceService.findAttendancesByCustomerService(serviceId));
     }
 	
@@ -36,7 +36,7 @@ public class AttendanceController {
             @RequestParam AttendanceStatus status) {
 
         try {
-            Attendance created = attendanceService.recordAttendance(customerServiceId, userId, status);
+            AttendanceDTO created = attendanceService.recordAttendance(customerServiceId, userId, status);
             return ResponseEntity.ok(created);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -44,10 +44,10 @@ public class AttendanceController {
     }
 	
 	@PutMapping("/update/{attendanceId}")
-    public ResponseEntity<Attendance> updateAttendance(
+    public ResponseEntity<AttendanceDTO> updateAttendance(
             @PathVariable Long attendanceId,
             @RequestParam AttendanceStatus status) {
-        Attendance updatedAttendance = attendanceService.updateAttendance(attendanceId, status);
+        AttendanceDTO updatedAttendance = attendanceService.updateAttendance(attendanceId, status);
         return ResponseEntity.ok(updatedAttendance);
     }
 }

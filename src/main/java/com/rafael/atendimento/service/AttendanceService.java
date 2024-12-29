@@ -5,10 +5,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.rafael.atendimento.dto.AttendanceDTO;
 import com.rafael.atendimento.dto.UpdateRequestDTO;
+import com.rafael.atendimento.dto.mapper.AttendanceMapper;
 import com.rafael.atendimento.entity.Attendance;
 import com.rafael.atendimento.entity.CustomerService;
 import com.rafael.atendimento.entity.User;
@@ -26,6 +29,7 @@ public class AttendanceService {
 	private final AttendanceRepository attendanceRepository;
 	private final CustomerServiceService customerService;
 	private final UserService userService;
+	private final AttendanceMapper attendanceMapper;
 	
 	// Busca presença por atendimento e usuário
     public Optional<Attendance> findAttendanceByUserAndService(Long customerServiceId, Long userId) {
@@ -33,11 +37,14 @@ public class AttendanceService {
     }
     
     // Busca todas as presenças de um atendimento
-    public List<Attendance> findAttendancesByCustomerService(Long customerServiceId) {
-        return attendanceRepository.findByCustomerServiceId(customerServiceId);
+    public List<AttendanceDTO> findAttendancesByCustomerService(Long customerServiceId) {
+        return attendanceRepository.findByCustomerServiceId(customerServiceId)
+        		.stream()
+        		.map(attendanceMapper::toDTO)
+        		.collect(Collectors.toList());
     }
 	
-	public Attendance recordAttendance(Long serviceId, Long userId, AttendanceStatus status) {
+	public AttendanceDTO recordAttendance(Long serviceId, Long userId, AttendanceStatus status) {
 		
 		Optional<Attendance> existingAttendance = findAttendanceByUserAndService(serviceId, userId);
 		if (existingAttendance.isPresent()) {
@@ -47,7 +54,7 @@ public class AttendanceService {
 		User user = userService.findUserById(userId);
 		CustomerService service = customerService.findServiceById(serviceId);
 		
-		if(!(service.getOwner() == user) || !(service.getStudent() == user)) {
+		if(service.getOwner() != user && service.getStudent() != user) {
 			throw new IllegalArgumentException("Usuário não pertence ao atendimento.");
 		}
 		
@@ -72,7 +79,7 @@ public class AttendanceService {
             handleAbsence(userId, saved.getUser().getTypeAccess());
         }
         
-        return saved;
+        return attendanceMapper.toDTO(saved);
     }
 	
 	private void handleAbsence(Long userId, TypeAccess role) {
@@ -87,7 +94,7 @@ public class AttendanceService {
         }
     }
 	
-	public Attendance updateAttendance(Long attendanceId, AttendanceStatus newStatus) {
+	public AttendanceDTO updateAttendance(Long attendanceId, AttendanceStatus newStatus) {
         // Busca o registro de presença pelo ID
         Attendance attendance = attendanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Registro de presença não encontrado."));
@@ -98,6 +105,7 @@ public class AttendanceService {
         }
 
         // Salva as alterações
-        return attendanceRepository.save(attendance);
+        Attendance saved = attendanceRepository.save(attendance);
+        return attendanceMapper.toDTO(saved);
     }
 }
