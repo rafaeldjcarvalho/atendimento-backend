@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rafael.atendimento.dto.RegisterRequestDTO;
+import com.rafael.atendimento.dto.ResponseDTO;
 import com.rafael.atendimento.dto.UpdateRequestDTO;
 import com.rafael.atendimento.dto.UserDTO;
 import com.rafael.atendimento.service.UserService;
@@ -49,7 +50,7 @@ public class UserController {
 	
 	@PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UpdateRequestDTO userRequest) {
-	   UserDTO user = userService.update(id, userRequest);
+	   ResponseDTO user = userService.update(id, userRequest);
 	   return ResponseEntity.ok(user);
     }
 	

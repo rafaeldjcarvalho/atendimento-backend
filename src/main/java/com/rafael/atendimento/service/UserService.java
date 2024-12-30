@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.rafael.atendimento.dto.RegisterRequestDTO;
+import com.rafael.atendimento.dto.ResponseDTO;
 import com.rafael.atendimento.dto.UpdateRequestDTO;
 import com.rafael.atendimento.dto.UserDTO;
 import com.rafael.atendimento.dto.mapper.UserMapper;
 import com.rafael.atendimento.entity.User;
+import com.rafael.atendimento.infra.security.TokenService;
 import com.rafael.atendimento.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
 	private final PasswordEncoder passwordEncoder;
+	private final TokenService tokenService;
 	
 	public List<UserDTO> findAll() {
 		return userRepository.findAll()
@@ -68,17 +71,18 @@ public class UserService {
         throw new RuntimeException("User already exists");
     }
 	
-	public UserDTO update(Long id, UpdateRequestDTO userRequest) {
+	public ResponseDTO update(Long id, UpdateRequestDTO userRequest) {
 		User existingUser = userRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        		
-		existingUser.setPassword(passwordEncoder.encode(userRequest.password()));
+        if(!userRequest.password().isEmpty()) existingUser.setPassword(passwordEncoder.encode(userRequest.password()));
 		existingUser.setEmail(userRequest.email());
 		existingUser.setName(userRequest.name());
 		existingUser.setTypeAccess(userMapper.convertTypeAccessValue(userRequest.typeAccess()));
 		existingUser.setStatus(userMapper.convertUserStatusValue(userRequest.status()));
         User updatedUser = userRepository.save(existingUser);
-        return userMapper.toDTO(updatedUser);
+        
+        String token = tokenService.generateToken(updatedUser);
+        return new ResponseDTO(updatedUser.getName(), token);
     }
 	
 	public void delete(Long id) {
