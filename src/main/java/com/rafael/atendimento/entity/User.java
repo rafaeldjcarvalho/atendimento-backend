@@ -1,5 +1,6 @@
 package com.rafael.atendimento.entity;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.hibernate.validator.constraints.Length;
@@ -70,6 +71,9 @@ public class User {
     @Column(length = 10, nullable = false)
     @Convert(converter = UserStatusConverter.class)
 	private UserStatus status = UserStatus.ATIVO;
+	
+	private LocalDate dataSuspensao;
+	private LocalDate dataReativacao;
 	
 	@OneToMany(mappedBy = "owner")
 	@JsonIgnoreProperties("owner")

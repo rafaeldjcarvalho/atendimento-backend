@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.rafael.atendimento.enums.AttendanceStatus;
 import com.rafael.atendimento.enums.ServiceStatus;
 import com.rafael.atendimento.enums.converters.ServiceStatusConverter;
 
@@ -88,5 +89,22 @@ public class CustomerService {
 	@OneToMany(mappedBy = "customerService", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnoreProperties("customerService")
 	private List<Attendance> attendances;
+	
+	public void atualizarStatus() {
+        if (attendances == null || attendances.isEmpty()) {
+            this.status = ServiceStatus.PENDENTE;
+            return;
+        }
 
+        long presentes = attendances.stream().filter(p -> p.getStatus() == AttendanceStatus.PRESENTE).count();
+        long ausentes = attendances.stream().filter(p -> p.getStatus() == AttendanceStatus.AUSENTE).count();
+
+        if (presentes == 2 || (presentes == 1 && ausentes == 1)) {
+            this.status = ServiceStatus.CONCLUIDO;
+        } else if (ausentes == 2) {
+            this.status = ServiceStatus.CANCELADO;
+        } else {
+            this.status = ServiceStatus.PENDENTE;
+        }
+    }
 }

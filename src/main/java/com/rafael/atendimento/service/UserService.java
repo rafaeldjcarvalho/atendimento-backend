@@ -1,5 +1,6 @@
 package com.rafael.atendimento.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,7 +16,10 @@ import com.rafael.atendimento.dto.UpdateRequestDTO;
 import com.rafael.atendimento.dto.UserDTO;
 import com.rafael.atendimento.dto.mapper.UserMapper;
 import com.rafael.atendimento.entity.User;
+import com.rafael.atendimento.enums.AttendanceStatus;
+import com.rafael.atendimento.enums.UserStatus;
 import com.rafael.atendimento.infra.security.TokenService;
+import com.rafael.atendimento.repository.AttendanceRepository;
 import com.rafael.atendimento.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	
 	private final UserRepository userRepository;
+	private final AttendanceRepository attendanceRepository;
 	private final UserMapper userMapper;
 	private final PasswordEncoder passwordEncoder;
 	private final TokenService tokenService;
@@ -122,4 +127,37 @@ public class UserService {
 		userRepository.save(existingUser);
 		return userMapper.toDTO(existingUser);
 	}
+	
+	public List<User> buscarUsuariosSuspensos() {
+		return userRepository.findByStatus(UserStatus.SUSPENSO);
+	}
+	
+	public void verificarSuspensao(Long usuarioId) {
+        User usuario = userRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+
+        if (usuario.getStatus() == UserStatus.SUSPENSO && LocalDate.now().isAfter(usuario.getDataReativacao())) {
+            usuario.setStatus(UserStatus.ATIVO);
+            usuario.setDataSuspensao(null);
+            usuario.setDataReativacao(null);
+            userRepository.save(usuario);
+            return;
+        }
+
+        if (usuario.getStatus() == UserStatus.SUSPENSO && usuario.getDataSuspensao() != null) {
+            return; // Não avaliar novamente se já está suspenso
+        }
+
+        // Verifica se houve mais de 3 ausências na última semana
+        LocalDate umaSemanaAtras = LocalDate.now().minusWeeks(1);
+        Long ausenciasRecentes = attendanceRepository.countByUserIdAndStatusAndDateAfter(
+				usuario.getId(), AttendanceStatus.AUSENTE, umaSemanaAtras);
+
+        if (ausenciasRecentes >= 3) {
+            usuario.setStatus(UserStatus.SUSPENSO);
+            usuario.setDataSuspensao(LocalDate.now());
+            usuario.setDataReativacao(LocalDate.now().plusWeeks(1)); // adiciona 1 semana
+            userRepository.save(usuario);
+        }
+    }
 }

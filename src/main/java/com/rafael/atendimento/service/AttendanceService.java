@@ -10,14 +10,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.rafael.atendimento.dto.AttendanceDTO;
-import com.rafael.atendimento.dto.UpdateRequestDTO;
+import com.rafael.atendimento.dto.CustomerServiceDTO;
 import com.rafael.atendimento.dto.mapper.AttendanceMapper;
 import com.rafael.atendimento.entity.Attendance;
 import com.rafael.atendimento.entity.CustomerService;
 import com.rafael.atendimento.entity.User;
 import com.rafael.atendimento.enums.AttendanceStatus;
-import com.rafael.atendimento.enums.TypeAccess;
-import com.rafael.atendimento.enums.UserStatus;
 import com.rafael.atendimento.repository.AttendanceRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -74,25 +72,23 @@ public class AttendanceService {
         attendance.setTime(LocalTime.now());
 
         Attendance saved = attendanceRepository.save(attendance);
+        
+        updateStatusOfService(service);
 
         if (status == AttendanceStatus.AUSENTE) {
-            handleAbsence(userId, saved.getUser().getTypeAccess());
+            userService.verificarSuspensao(userId);
         }
         
         return attendanceMapper.toDTO(saved);
     }
 	
-	private void handleAbsence(Long userId, TypeAccess role) {
-        // Lógica para aplicar punição com base no tipo de usuário
-        long absences = attendanceRepository.countByUserIdAndStatus(userId, AttendanceStatus.AUSENTE);
-        if (absences >= 3) {
-            User user = userService.findUserById(userId);
-            user.setStatus(UserStatus.SUSPENSO); // Exemplo de punição
-            userService.update(user.getId(), new UpdateRequestDTO(user.getName(), 
-            		user.getEmail(), user.getPassword(), user.getTypeAccess().toString(), 
-            			user.getStatus().toString()));
-        }
-    }
+	private void updateStatusOfService(CustomerService service) {
+		service.atualizarStatus();
+        customerService.update(service.getId(), new CustomerServiceDTO(service.getId(), 
+        		service.getTitle(), service.getDescription(), service.getDate(), service.getTime_start(), 
+        			service.getTime_end(), service.getStatus().toString(), service.getClazz().getId(), service.getOwner().getId(), 
+        				service.getStudent().getId()));
+	}
 	
 	public AttendanceDTO updateAttendance(Long attendanceId, AttendanceStatus newStatus) {
         // Busca o registro de presença pelo ID
@@ -106,6 +102,9 @@ public class AttendanceService {
 
         // Salva as alterações
         Attendance saved = attendanceRepository.save(attendance);
+        
+        updateStatusOfService(saved.getCustomerService());
+        
         return attendanceMapper.toDTO(saved);
     }
 }
