@@ -63,7 +63,7 @@ public class TokenService {
 	                .verify(token);
 
 	        // Obtém informações do token
-	        String role = decodedToken.getClaim("role").asString();
+	        String role = decodedToken.getClaim("access").asString();
 	        String status = decodedToken.getClaim("status").asString();
 
 	        // Valida se o perfil está permitido
