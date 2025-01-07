@@ -13,6 +13,7 @@ import com.rafael.atendimento.entity.CustomerService;
 public interface CustomerServiceRepository extends JpaRepository<CustomerService, Long> {
 	
 	List<CustomerService> findByOwner_Id(Long ownerId);
+	List<CustomerService> findByClazz_Id(Long classId);
     Page<CustomerService> findByClazz_Id(Long classId, Pageable pageable);
     Page<CustomerService> findByOwner_Id(Long ownerId, Pageable pageable);
     Page<CustomerService> findByStudent_Id(Long studentId, Pageable pageable);

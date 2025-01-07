@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rafael.atendimento.dto.CalendarDTO;
 import com.rafael.atendimento.dto.ClassDTO;
 import com.rafael.atendimento.dto.ClassPageDTO;
+import com.rafael.atendimento.dto.ReportDTO;
 import com.rafael.atendimento.entity.Class;
 import com.rafael.atendimento.service.CalendarService;
 import com.rafael.atendimento.service.ClassService;
+import com.rafael.atendimento.service.ReportService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -34,6 +36,7 @@ public class ClassController {
 	
 	private final ClassService classService;
 	private final CalendarService calendarService;
+	private final ReportService reportService;
 	
 //	@GetMapping
 //	public List<ClassDTO> findAll() {
@@ -153,5 +156,11 @@ public class ClassController {
     	} catch (RuntimeException ex) {
     		return ResponseEntity.badRequest().body(ex.getMessage());
     	}
+    }
+    
+    @GetMapping("/{classId}/report")
+    public ResponseEntity<ReportDTO> getClassReport(@PathVariable Long classId) {
+        ReportDTO report = reportService.generateReport(classId);
+        return ResponseEntity.ok(report);
     }
 }
