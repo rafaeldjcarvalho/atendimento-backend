@@ -1,7 +1,9 @@
 package com.rafael.atendimento.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.itextpdf.text.DocumentException;
 import com.rafael.atendimento.dto.CalendarDTO;
 import com.rafael.atendimento.dto.ClassDTO;
 import com.rafael.atendimento.dto.ClassPageDTO;
@@ -162,5 +165,16 @@ public class ClassController {
     public ResponseEntity<ReportDTO> getClassReport(@PathVariable Long classId) {
         ReportDTO report = reportService.generateReport(classId);
         return ResponseEntity.ok(report);
+    }
+    
+    @GetMapping("/{classId}/report/pdf")
+    public ResponseEntity<byte[]> generateReportPdf(@PathVariable Long classId) throws DocumentException, IOException {
+        byte[] pdfContent = reportService.generateReportPdf(classId);
+        // Retornar o PDF como resposta
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=report.pdf");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfContent);
     }
 }
