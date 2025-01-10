@@ -78,12 +78,12 @@ public class ClassService {
         throw new RuntimeException("Class already exists");
     }
 	
-	public ClassDTO update(Long id, Class classRequest) {
+	public ClassDTO update(Long id, ClassDTO classRequest) {
 		Class existingClass = classRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
         		
-		existingClass.setName(classRequest.getName());
-		existingClass.setDate(classRequest.getDate());
+		existingClass.setName(classRequest.name());
+		existingClass.setDate(classRequest.date());
         Class updatedClass = classRepository.save(existingClass);
         return classMapper.toDTO(updatedClass);
     }

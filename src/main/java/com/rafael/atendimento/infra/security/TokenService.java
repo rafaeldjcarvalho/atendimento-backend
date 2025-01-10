@@ -12,11 +12,19 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
+import com.rafael.atendimento.dto.UserDTO;
+import com.rafael.atendimento.dto.mapper.UserMapper;
 import com.rafael.atendimento.entity.User;
+import com.rafael.atendimento.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class TokenService {
+	
+	private final UserRepository userRepository;
+	private final UserMapper mapper;
 	
 	@Value("${api.security.token.secret}")
 	private String secret;
@@ -55,35 +63,49 @@ public class TokenService {
 	public boolean validateTokenAndPermissions(String token, List<String> allowedRoles, boolean allowInactive) {
 	    try {
 	        Algorithm algorithm = Algorithm.HMAC256(secret);
+	        String[] splitToken = token.split(" ");
 
 	        // Decodifica e valida o token
-	        DecodedJWT decodedToken = JWT.require(algorithm)
+	        String userSubject = JWT.require(algorithm)
 	                .withIssuer("login-auth-api")
 	                .build()
-	                .verify(token);
+	                .verify(splitToken[1])
+	                .getSubject();
 
 	        // Obtém informações do token
-	        String role = decodedToken.getClaim("access").asString();
-	        String status = decodedToken.getClaim("status").asString();
+	        //String userId = decodedToken.getClaim("id").asString();
+	        //String role = decodedToken.getClaim("access").asString();
+
+	        // Consulta os dados do usuário no banco
+	        UserDTO user = mapper.toDTO(userRepository.findByEmail(userSubject)
+	                .orElseThrow(() -> new RuntimeException("Usuário não encontrado.")));
+
+	        // Valida se o perfil no banco corresponde ao perfil do token
+	        //if (!user.access().equals(role)) {
+	        //    throw new RuntimeException("Inconsistência de perfis: o token não corresponde ao perfil do usuário.");
+	        //}
 
 	        // Valida se o perfil está permitido
-	        if (allowedRoles != null && !allowedRoles.contains(role)) {
-	            throw new RuntimeException("Acesso negado para o perfil: " + role);
+	        if (allowedRoles != null && !allowedRoles.contains(user.access())) {
+	            throw new RuntimeException("Acesso negado para o perfil: " + user.access());
 	        }
 
 	        // Valida o status do usuário
-	        if (!"Ativo".equals(status) && !allowInactive) {
-	            throw new RuntimeException("A conta está inativa.");
+	        if (!"Ativo".equals(user.status()) && !allowInactive) {
+	            throw new RuntimeException("A conta está inativa ou suspensa.");
 	        }
 
 	        return true;
 	    } catch (JWTVerificationException exception) {
 	        throw new RuntimeException("Token inválido ou expirado.", exception);
+	    } catch (NumberFormatException e) {
+	        throw new RuntimeException("Formato de ID de usuário inválido no token.", e);
 	    }
 	}
 
 	
 	private Instant generateExpirationDate(){
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+        //return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+		return LocalDateTime.now().plusMinutes(10).toInstant(ZoneOffset.of("-03:00"));
     }
 }
