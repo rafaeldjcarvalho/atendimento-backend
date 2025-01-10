@@ -35,13 +35,9 @@ public class CalendarController {
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long calendarId, 
     		@RequestBody @Valid ScheduleDTO scheduleDTO) {
-        try {
-        	tokenService.validateTokenAndPermissions(token, List.of("Admin", "Monitor", "Professor"), false);
-            ScheduleDTO newSchedule = scheduleService.addSchedule(calendarId, scheduleDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
-        } catch (RuntimeException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    	tokenService.validateTokenAndPermissions(token, List.of("Admin", "Monitor", "Professor"), false);
+        ScheduleDTO newSchedule = scheduleService.addSchedule(calendarId, scheduleDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
     }
     
  // Listar horários de um calendário

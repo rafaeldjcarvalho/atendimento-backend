@@ -49,13 +49,9 @@ public class UserController {
     public ResponseEntity<?> createUser(
     		@RequestHeader("Authorization") String token, 
     		@RequestBody RegisterRequestDTO userRequest) {
-       try {
-    	   tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
-    	   UserDTO user = userService.create(userRequest);
-    	   return ResponseEntity.ok(user);
-       } catch (RuntimeException ex) {
-    	   return ResponseEntity.badRequest().body(ex.getMessage());
-       }
+	   tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
+	   UserDTO user = userService.create(userRequest);
+	   return ResponseEntity.ok(user);
     }
 	
 	@PutMapping("/{id}")
@@ -81,39 +77,27 @@ public class UserController {
     public ResponseEntity<?> getUserClasses(
     		@RequestHeader("Authorization") String token, 
     		@PathVariable Long classId) {
-		try {
-			tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
-			List<UserDTO> users = userService.getAllStudentsInClass(classId);
-	        return ResponseEntity.ok(users);
-		} catch (RuntimeException ex) {
-			return ResponseEntity.badRequest().body(ex.getMessage());
-		}
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
+		List<UserDTO> users = userService.getAllStudentsInClass(classId);
+        return ResponseEntity.ok(users);
     }
 	
 	@GetMapping("/userTeachers-class/{classId}")
     public ResponseEntity<?> getUserTeachersClasses(
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long classId) {
-		try {
-			tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
-			List<UserDTO> users = userService.getAllTeachersInClass(classId);
-	        return ResponseEntity.ok(users);
-		} catch (RuntimeException ex) {
-			return ResponseEntity.badRequest().body(ex.getMessage());
-		}
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
+		List<UserDTO> users = userService.getAllTeachersInClass(classId);
+        return ResponseEntity.ok(users);
     }
 	
 	@GetMapping("/userMonitors-class/{classId}")
     public ResponseEntity<?> getUserMonitorsClasses(
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long classId) {
-		try {
-			tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
-			List<UserDTO> users = userService.getAllMonitorsInClass(classId);
-	        return ResponseEntity.ok(users);
-		} catch (RuntimeException ex) {
-			return ResponseEntity.badRequest().body(ex.getMessage());
-		}
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
+		List<UserDTO> users = userService.getAllMonitorsInClass(classId);
+        return ResponseEntity.ok(users);
     }
 
 }

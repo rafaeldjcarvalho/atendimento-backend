@@ -65,13 +65,9 @@ public class OrderServiceController {
     public ResponseEntity<?> createOrder(
     		@RequestHeader("Authorization") String token,
     		@RequestBody @Valid OrderServiceDTO order) {
-    	try {
-    		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor"), false);
-    		OrderServiceDTO createdOrder = orderService.create(order);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
-    	} catch(RuntimeException ex) {
-    		return ResponseEntity.badRequest().body(ex.getMessage());
-    	}
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor"), false);
+		OrderServiceDTO createdOrder = orderService.create(order);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
     
     // Atualizar pedido de atendimento por ID
@@ -80,13 +76,9 @@ public class OrderServiceController {
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long id, 
     		@RequestBody @Valid OrderServiceDTO order) {
-        try {
-        	tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor"), false);
-        	OrderServiceDTO updatedOrder = orderService.update(id, order);
-            return ResponseEntity.ok(updatedOrder);
-        } catch(RuntimeException ex) {
-        	return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    	tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor"), false);
+    	OrderServiceDTO updatedOrder = orderService.update(id, order);
+        return ResponseEntity.ok(updatedOrder);
     }
     
     // Excluir pedido de atendimento por ID

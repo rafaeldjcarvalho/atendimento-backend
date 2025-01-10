@@ -15,6 +15,9 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.rafael.atendimento.dto.UserDTO;
 import com.rafael.atendimento.dto.mapper.UserMapper;
 import com.rafael.atendimento.entity.User;
+import com.rafael.atendimento.exception.AccessDeniedException;
+import com.rafael.atendimento.exception.AccountInactiveException;
+import com.rafael.atendimento.exception.InvalidTokenException;
 import com.rafael.atendimento.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -87,17 +90,17 @@ public class TokenService {
 
 	        // Valida se o perfil está permitido
 	        if (allowedRoles != null && !allowedRoles.contains(user.access())) {
-	            throw new RuntimeException("Acesso negado para o perfil: " + user.access());
+	            throw new AccessDeniedException("Acesso negado para o perfil: " + user.access());
 	        }
 
 	        // Valida o status do usuário
 	        if (!"Ativo".equals(user.status()) && !allowInactive) {
-	            throw new RuntimeException("A conta está inativa ou suspensa.");
+	            throw new AccountInactiveException("A conta está inativa ou suspensa.");
 	        }
 
 	        return true;
 	    } catch (JWTVerificationException exception) {
-	        throw new RuntimeException("Token inválido ou expirado.", exception);
+	        throw new InvalidTokenException("Token inválido ou expirado.");
 	    } catch (NumberFormatException e) {
 	        throw new RuntimeException("Formato de ID de usuário inválido no token.", e);
 	    }

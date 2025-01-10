@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rafael.atendimento.dto.AttendanceDTO;
 import com.rafael.atendimento.enums.AttendanceStatus;
+import com.rafael.atendimento.exception.AccessDeniedException;
+import com.rafael.atendimento.exception.AccountInactiveException;
+import com.rafael.atendimento.exception.InvalidTokenException;
 import com.rafael.atendimento.infra.security.TokenService;
 import com.rafael.atendimento.service.AttendanceService;
 
@@ -45,6 +48,8 @@ public class AttendanceController {
         	tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), false);
             AttendanceDTO created = attendanceService.recordAttendance(customerServiceId, userId, status);
             return ResponseEntity.ok(created);
+        } catch (AccessDeniedException | AccountInactiveException | InvalidTokenException ex) {
+            throw ex;
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

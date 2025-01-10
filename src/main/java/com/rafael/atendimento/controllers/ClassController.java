@@ -70,13 +70,9 @@ public class ClassController {
     public ResponseEntity<?> createClass(
     		@RequestHeader("Authorization") String token,
     		@RequestBody @Valid ClassDTO classRequest) {
-       try {
-    	   tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
-    	   ClassDTO findClass = classService.create(classRequest);
-    	   return ResponseEntity.ok(findClass);
-       } catch (RuntimeException ex) {
-    	   return ResponseEntity.badRequest().body(ex.getMessage());
-       }
+	   tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
+	   ClassDTO findClass = classService.create(classRequest);
+	   return ResponseEntity.ok(findClass);
     }
 	
 	@PutMapping("/{id}")
@@ -84,13 +80,9 @@ public class ClassController {
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long id, 
     		@RequestBody @Valid ClassDTO classRequest) {
-		try {
-			tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
-			ClassDTO findClass = classService.update(id, classRequest);
-			return ResponseEntity.ok(findClass);
-		} catch (RuntimeException ex) {
-	    	return ResponseEntity.badRequest().body(ex.getMessage());
-	    }
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
+		ClassDTO findClass = classService.update(id, classRequest);
+		return ResponseEntity.ok(findClass);
     }
 	
 	@DeleteMapping("/{id}")
@@ -109,13 +101,9 @@ public class ClassController {
 			@RequestHeader("Authorization") String token,
 			@PathVariable Long classId, 
 			@PathVariable Long userId) {
-		try {
-			tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), false);
-			ClassDTO updatedClass = classService.addUserInClass(classId, userId);
-			return ResponseEntity.ok(updatedClass);
-        } catch (RuntimeException ex) {
-        	return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), false);
+		ClassDTO updatedClass = classService.addUserInClass(classId, userId);
+		return ResponseEntity.ok(updatedClass);
 	}
 	
 	@DeleteMapping("/{classId}/remove-user/{userId}")
@@ -123,26 +111,18 @@ public class ClassController {
 			@RequestHeader("Authorization") String token,
 			@PathVariable Long classId, 
 			@PathVariable Long userId) {
-		try {
-			tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), false);
-			ClassDTO updatedClass = classService.deleteUserInClass(classId, userId);
-			return ResponseEntity.ok(updatedClass);
-        } catch (RuntimeException ex) {
-        	return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), false);
+		ClassDTO updatedClass = classService.deleteUserInClass(classId, userId);
+		return ResponseEntity.ok(updatedClass);
 	}
 	
 	@GetMapping("/class-user/{userId}")
     public ResponseEntity<?> getUserClasses(
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long userId) {
-		try {
-			tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
-			List<ClassDTO> classes = classService.getClassesForUser(userId);
-	        return ResponseEntity.ok(classes);
-		} catch (RuntimeException ex) {
-			return ResponseEntity.badRequest().body(ex.getMessage());
-		}
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
+		List<ClassDTO> classes = classService.getClassesForUser(userId);
+        return ResponseEntity.ok(classes);
     }
 	
 	// Criar um novo calendário para a turma
@@ -151,13 +131,9 @@ public class ClassController {
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long classId, 
     		@RequestBody @Valid CalendarDTO calendarDTO) {
-        try {
-        	tokenService.validateTokenAndPermissions(token, List.of("Admin", "Monitor", "Professor"), false);
-            CalendarDTO newCalendar = calendarService.createCalendar(classId, calendarDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newCalendar);
-        } catch (RuntimeException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    	tokenService.validateTokenAndPermissions(token, List.of("Admin", "Monitor", "Professor"), false);
+        CalendarDTO newCalendar = calendarService.createCalendar(classId, calendarDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCalendar);
     }
 	
 	// Listar todos os calendários de uma turma
@@ -186,13 +162,9 @@ public class ClassController {
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long classId, 
     		@PathVariable Long userId) {
-    	try {
-    		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
-    		classService.promoteToMonitor(classId, userId);
-    		return ResponseEntity.ok().build();
-    	} catch (RuntimeException ex) {
-    		return ResponseEntity.badRequest().body(ex.getMessage());
-    	}
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
+		classService.promoteToMonitor(classId, userId);
+		return ResponseEntity.ok().build();
     }
     
     @PutMapping("/{classId}/demote/{userId}")
@@ -200,13 +172,9 @@ public class ClassController {
     		@RequestHeader("Authorization") String token,
     		@PathVariable Long classId, 
     		@PathVariable Long userId) {
-    	try {
-    		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
-    		classService.demoteToStudent(classId, userId);
-    		return ResponseEntity.ok().build();
-    	} catch (RuntimeException ex) {
-    		return ResponseEntity.badRequest().body(ex.getMessage());
-    	}
+		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Professor"), false);
+		classService.demoteToStudent(classId, userId);
+		return ResponseEntity.ok().build();
     }
     
     @GetMapping("/{classId}/report")
