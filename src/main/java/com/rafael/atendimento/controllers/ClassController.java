@@ -52,7 +52,7 @@ public class ClassController {
     public ClassPageDTO list(
     		@RequestHeader("Authorization") String token,
     		@RequestParam(defaultValue = "0") @PositiveOrZero int page,
-            @RequestParam(defaultValue = "10") @Positive @Max(100) int pageSize) {
+            @RequestParam(defaultValue = "12") @Positive @Max(100) int pageSize) {
 		tokenService.validateTokenAndPermissions(token, List.of("Admin", "Aluno", "Monitor", "Professor"), true);
         return classService.list(page, pageSize);
     }
