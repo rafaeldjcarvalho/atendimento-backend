@@ -31,6 +31,7 @@ public class ClassService {
 	private final ClassRepository classRepository;
 	private final UserService userService;
 	private final ClassMapper classMapper;
+	private final NotificationService notificationService;
 	
 //	public List<ClassDTO> findAll() {
 //		return classRepository.findAll()
@@ -155,6 +156,8 @@ public class ClassService {
 	    // Salva as alterações
 	    userService.updateTypeOfUser(aluno);
 	    classRepository.save(turma);
+	    
+	    notificationService.notifyUserBecameMonitor(aluno.getEmail(), turma.getName());
 	}
 	
 	public void demoteToStudent(Long classId, Long userId) {
@@ -179,6 +182,8 @@ public class ClassService {
 	    // Salva as alterações
 	    userService.updateTypeOfUser(monitor);
 	    classRepository.save(turma);
+	    
+	    notificationService.notifyUserRemoveMonitor(monitor.getEmail(), turma.getName());
 	}
 	
 	public List<ClassDTO> getClassesForUser(Long userId) {

@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import com.rafael.atendimento.entity.CustomerService;
 import com.rafael.atendimento.entity.Schedule;
 import com.rafael.atendimento.entity.User;
 import com.rafael.atendimento.enums.DaysOfWeek;
+import com.rafael.atendimento.enums.ServiceStatus;
 import com.rafael.atendimento.repository.CustomerServiceRepository;
 
 import jakarta.validation.constraints.Max;
@@ -35,6 +37,9 @@ public class CustomerServiceService {
 	private final CustomerServiceMapper serviceMapper;
 	private final ClassService classService;
 	private final UserService userService;
+	
+	@Autowired
+	private NotificationService notificationService;
 	
 //	public List<CustomerServiceDTO> findAll() {
 //		return serviceRepository.findAll().stream()
@@ -98,6 +103,11 @@ public class CustomerServiceService {
 		validarCompatibilidadeDeHorarios(service, owner, clazz);
 		
 		CustomerService saved = serviceRepository.save(service);
+		
+		if(saved.getStatus().equals(ServiceStatus.CONCLUIDO)) {
+			notificationService.notifyRequestCompleted(saved.getOwner().getEmail(), saved.getTitle());
+			notificationService.notifyRequestCompleted(saved.getStudent().getEmail(), saved.getTitle());
+		}
 		
 		return serviceMapper.toDTO(saved);
 	}

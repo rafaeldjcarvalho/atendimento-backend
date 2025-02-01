@@ -54,4 +54,21 @@ public class AuthService {
         }
         throw new RuntimeException("User already exists");
     }
+	
+	public ResponseDTO updatePassword(String email, String password) {
+        Optional<User> user = repository.findByEmail(email);
+        if (!user.isEmpty()) {
+        	try {
+        		User newUser = user.get();
+                newUser.setPassword(passwordEncoder.encode(password));
+                repository.save(newUser);
+                String token = tokenService.generateToken(newUser);
+                return new ResponseDTO(newUser.getName(), token);
+        	} catch (Exception ex) {
+        		throw new RuntimeException("User not registred");
+        	}
+            
+        }
+        throw new RuntimeException("User already exists");
+    }
 }

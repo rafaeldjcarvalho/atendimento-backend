@@ -34,7 +34,7 @@ public class AtendimentoApplication {
 			
 			User u2 = new User();
 			u2.setName("Rafael");
-			u2.setEmail("rafael@gmail.com");
+			u2.setEmail("rafadejesus125@gmail.com");
 			u2.setTypeAccess(TypeAccess.PROFESSOR);
 			u2.setPassword("$2a$10$aq7HHnTFjjjyVEzLSDdln.u3TM3cOljBJLbavmN5gh9bD39otl/Ry");
 			

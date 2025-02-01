@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,9 @@ public class UserService {
 	private final UserMapper userMapper;
 	private final PasswordEncoder passwordEncoder;
 	private final TokenService tokenService;
+	
+	@Autowired
+	private NotificationService notificationService;
 	
 	public List<UserDTO> findAll() {
 		return userRepository.findAll()
@@ -141,6 +145,8 @@ public class UserService {
             usuario.setDataSuspensao(null);
             usuario.setDataReativacao(null);
             userRepository.save(usuario);
+            // Notificar usuário
+            notificationService.notifyUserSuspensionEnded(usuario.getEmail());
             return;
         }
 
@@ -158,6 +164,8 @@ public class UserService {
             usuario.setDataSuspensao(LocalDate.now());
             usuario.setDataReativacao(LocalDate.now().plusWeeks(1)); // adiciona 1 semana
             userRepository.save(usuario);
+            // Notificar usuário
+            notificationService.notifyUserSuspended(usuario.getEmail(), "3 ausências na última semana", 7);
         }
     }
 }

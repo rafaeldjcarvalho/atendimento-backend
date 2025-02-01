@@ -31,6 +31,9 @@ public class OrderServiceService {
 	private final ClassService classService;
 	private final UserService userService;
 	
+	//@Autowired
+	//private NotificationService notificationService;
+	
 //	public List<OrderServiceDTO> findAll() {
 //		return orderRepository.findAll().stream()
 //				.map(orderMapper::toDTO)
@@ -57,6 +60,8 @@ public class OrderServiceService {
 		order.setOwner(owner);
 		
 		OrderService saved = orderRepository.save(order);
+		// Notificar usuário por e-mail
+	    //notificationService.notifyUserNewRequest(order.getOwner().getEmail(), order.getTitle());
 		
 		return orderMapper.toDTO(saved);
 	}
@@ -79,6 +84,8 @@ public class OrderServiceService {
 	public void delete(Long id) {
 		orderRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found"));
+		// Notificar usuário por e-mail
+	    //notificationService.notifyRequestDenied(order.getOwner().getEmail(), order.getTitle(), "Horários incompatíveis!");
 		orderRepository.deleteById(id);
 	}
 	
