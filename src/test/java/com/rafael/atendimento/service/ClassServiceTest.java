@@ -1,89 +1,95 @@
 package com.rafael.atendimento.service;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.web.server.ResponseStatusException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.rafael.atendimento.repository.ClassRepository;
+import com.rafael.atendimento.repository.UserRepository;
 import com.rafael.atendimento.dto.ClassDTO;
 import com.rafael.atendimento.dto.UserDTO;
 import com.rafael.atendimento.dto.mapper.ClassMapper;
-import com.rafael.atendimento.entity.User;
-import com.rafael.atendimento.enums.TypeAccess;
-import com.rafael.atendimento.enums.UserStatus;
-import com.rafael.atendimento.repository.ClassRepository;
+import com.rafael.atendimento.entity.Class;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+@ExtendWith(MockitoExtension.class)
 class ClassServiceTest {
 
     @Mock
     private ClassRepository classRepository;
-
+    
     @Mock
-    private UserService userService;
+    private UserRepository userRepository;
 
-    @Mock
-    private ClassMapper classMapper;
-
-    @Mock
-    private NotificationService notificationService;
-
+    @InjectMocks
     private ClassService classService;
+    
+    @InjectMocks
+	private UserService userService;
+    
+    @InjectMocks
+	private ClassMapper classMapper;
+
+    private Class clazz;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        classService = new ClassService(classRepository, userService, classMapper, notificationService);
+        clazz = new Class();
+        clazz.setId(1L);
+        clazz.setName("Turma Teste");
     }
 
     @Test
-    void testCreateClassAlreadyExists() {
-        // Criando DTO de entrada
-        UserDTO userDTO = new UserDTO(1L, "Professor", "owner@mail.com", "PROFESSOR", "ACTIVE");
-        ClassDTO classDTO = new ClassDTO(null, "Math", LocalDate.now(), userDTO);
-
-        // Mockando o comportamento
-        when(classRepository.findByName(classDTO.name())).thenReturn(Optional.of(new com.rafael.atendimento.entity.Class()));
-
-        // Executando o método e verificando exceção
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            classService.create(classDTO);
-        });
-
+    void testCreateClass_NameAlreadyExists() {
+        when(classRepository.findByName("Turma Teste")).thenReturn(Optional.of(clazz));
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> 
+            classService.create(new ClassDTO(1L, "Turma Teste", LocalDate.now(), new UserDTO(1L, "paulo", "teste@gmail.com", "Professor", "Ativo")))
+        );
         assertEquals("Class already exists", exception.getMessage());
     }
 
     @Test
-    void testFindByIdClassNotFound() {
-        // Mockando o comportamento
-        when(classRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Executando o método e verificando exceção
-        Exception exception = assertThrows(ResponseStatusException.class, () -> {
-            classService.findById(1L);
-        });
-
+    void testFindById_ClassNotFound() {
+        when(classRepository.findById(2L)).thenReturn(Optional.empty());
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> 
+            classService.findById(2L)
+        );
         assertEquals("404 NOT_FOUND \"Class not found\"", exception.getMessage());
     }
 
     @Test
-    void testDeleteClass() {
-        // Criando classe existente
-        com.rafael.atendimento.entity.Class existingClass = new com.rafael.atendimento.entity.Class();
-        when(classRepository.findById(1L)).thenReturn(Optional.of(existingClass));
-
-        // Executando o método
-        classService.delete(1L);
-
-        // Verificando a exclusão
-        verify(classRepository).delete(existingClass);
+    void testListClasses_InvalidPagination() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> 
+            classService.list(-1, 10)
+        );
+        assertEquals("Page index must not be less than zero", exception.getMessage());
     }
 
+    @Test
+    void testDeleteClass_Success() {
+        when(classRepository.findById(1L)).thenReturn(Optional.of(clazz));
+        doNothing().when(classRepository).delete(clazz);
+        
+        assertDoesNotThrow(() -> classService.delete(1L));
+    }
+
+    @Test
+    void testDeleteClass_NotFound() {
+        when(classRepository.findById(2L)).thenReturn(Optional.empty());
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> 
+            classService.delete(2L)
+        );
+        assertEquals("404 NOT_FOUND \"Class not found\"", exception.getMessage());
+    }
 }
