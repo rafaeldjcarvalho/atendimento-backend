@@ -61,6 +61,12 @@ class AttendanceServiceTest {
     }
     
     @Test
+    void testExample() {
+        System.out.println("Executando testExample...");
+        assertTrue(true);
+    }
+    
+    @Test
     void testFindAttendanceByUserAndService() {
         when(attendanceRepository.findByCustomerServiceIdAndUserId(1L, 1L)).thenReturn(Optional.of(attendance));
         Optional<Attendance> result = attendanceService.findAttendanceByUserAndService(1L, 1L);
